@@ -1,0 +1,82 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: black;
+}
+
+.court {
+    position: relative;
+    width: 780px; /* 78 feet */
+    height: 360px; /* 36 feet */
+    background-color: green;
+    border: 2px solid white;
+}
+
+.canvas-box {
+    position: absolute;
+    width: 980px;
+    height: 560px;
+    border: 2px solid rgb(88, 88, 88);
+}
+
+.service-boxes {
+    position: absolute;
+    width: 416px;
+    height: 266px;
+    border: 2px solid white;
+    top: 45px; 
+    left: 180px;
+}
+
+.net {
+    position: absolute;
+    width: 0;
+    height: 420px;
+    border-left: 2px solid white;
+    left: 390px; /* Half the court width */
+    top: -30px;
+}
+
+.doubles-alley {
+    position: absolute;
+    width: 780px;
+    height: 45px;
+    border: 2px solid white;
+}
+
+.center-line {
+    position: absolute;
+    width: 420px; /* Matches the court width */
+    height: 0;
+    border-top: 2px solid white;
+    top: 180px; /* Half the court height */
+    left: 180px;
+}
+
+
+#court {
+    position: relative;
+}
+
+#hitter {
+    position: absolute;
+    width: 20px;
+    height: 60px;
+    background-color: yellow;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#returner {
+    position: absolute;
+    width: 20px;
+    height: 60px;
+    background-color: blue;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#handednessToggle { margin: 10px; }

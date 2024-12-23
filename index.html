@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennis Angles Visualization</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div>
+        <label for="handednessToggle">Left-handed</label>
+        <input type="checkbox" id="handednessToggle">
+        <label for="handednessToggle">Right-handed</label>
+        <p></p>
+    </div>
+        <div class="court" id="court">
+            <!-- <canvas id="courtCanvas" width="980" height="560" style="top: -100px; left: -100px"></canvas> -->
+            <canvas id="courtCanvas" width="780" height="360"></canvas>
+            <div class="canvas-box" style="top: -100px; left: -100px"></div>
+            <div class="service-boxes"></div>
+            <div class="center-line"></div>
+            <div class="doubles-alley" style="top: -2px; left: -2px;"></div>
+            <div class="doubles-alley" style="bottom: -2px; left: -2px;"></div>
+            <div class="net"></div>
+            <div class="player" id="hitter" style="left: 100px; top: 150px;"></div>
+            <div class="player" id="returner" style="left: 450px; top: 100px;"></div>
+        </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const toggleSwitch = document.getElementById('handednessToggle');
+            const court = document.getElementById('court');
+            const net = document.querySelector('.net');
+            const canvas = document.getElementById('courtCanvas');
+            const ctx = canvas.getContext('2d');
+            const hitter = document.getElementById('hitter');
+            const returner = document.getElementById('returner');
+            
+            const courtRect = court.getBoundingClientRect();            
+            const netRect = net.getBoundingClientRect();
+            
+            const backRightCornerCoords = { x: 780, y: 360 };
+            const backLeftCornerCoords = { x: 780, y: 0 };
+            const frontRightCornerCoords = { x: 390, y: 360 };
+            const frontLeftCornerCoords = { x: 390, y: 0 };
+
+            function getCoordinates(obj) {
+                const rect = obj.getBoundingClientRect();
+                return {
+                    x: rect.left - courtRect.left + rect.width / 2,
+                    y: rect.top - courtRect.top + rect.height / 2
+                };
+            }
+
+            function getBoundingCoords(obj) {
+                const rect = obj.getBoundingClientRect();
+                return {
+                    topx: rect.left - courtRect.left,
+                    topy: rect.top - courtRect.top,
+                    botx: rect.left - courtRect.left + rect.width,
+                    boty: rect.bottom - courtRect.top
+                };
+            }
+
+            function getCoordinatesWithHandedness(coords,player="hitter",side="right"){
+                playerAdj = 1;
+                sideAdj = -1
+                if (player==="hitter"){
+                    playerAdj = -1;
+                    }
+                if (side==="left"){
+                        sideAdj = 1;
+                    }                    
+                coords.y = coords.y + (20 * playerAdj * sideAdj)
+                return coords;
+            }
+
+            function getReturnerBlockingCoords(returner){
+                const rect = returner.getBoundingClientRect();
+                return {
+                    topx: rect.left - courtRect.left + rect.width / 2,
+                    topy: rect.top - courtRect.top,
+                    botx: rect.left - courtRect.left + rect.width / 2,
+                    boty: rect.bottom - courtRect.top
+                };
+            }
+            
+            function calculateLinesIntersection(x1, y1, x2, y2, x3, y3, x4, y4) {
+                const slopeA = (y2 - y1) / (x2 - x1);
+                const interceptA = y1 - slopeA * x1;
+                const slopeB = (y4 - y3) / (x4 - x3);
+                console.log(`slopeA ${slopeA} interceptA ${interceptA} slopeB ${slopeB}`);
+                const interceptB = y3 - slopeB * x3;
+                const x = (interceptB - interceptA) / (slopeA - slopeB);
+                const y = slopeA * x + interceptA;
+                return { x: x, y: y };
+            }
+
+            function drawPolygon(points, fillColor) {
+                ctx.beginPath();
+                ctx.lineWidth = 0;
+                ctx.moveTo(points[0].x, points[0].y); // Move to the first point
+                
+                // Loop through the rest of the points
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+
+                ctx.closePath(); // Close the path
+                ctx.fillStyle = fillColor; // Set the fill color
+                ctx.fill(); // Fill the polygon
+            }
+            
+            function drawLineOfSight() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+                const hitterHandedness = toggleSwitch.checked ? 'left' : 'right';
+                const hitterCoords = getCoordinatesWithHandedness(getCoordinates(hitter),"hitter",hitterHandedness);
+                const returnerCoords = getCoordinatesWithHandedness(getCoordinates(returner),"returner","right");
+                const returnerBlockingCoords = getReturnerBlockingCoords(returner);
+                const netCoords = getCoordinates(net);
+                
+                // Example logic to draw lines (can be expanded for detailed calculations)
+                // ctx.beginPath();
+                // ctx.moveTo(hitterCoords.x, hitterCoords.y);
+                // if (hitterCoords.y <= frontRightCornerCoords.y) {
+                //     ctx.lineTo(frontRightCornerCoords.x, frontRightCornerCoords.y);
+                // } else {
+                //     ctx.lineTo(backRightCornerCoords.x, backRightCornerCoords.y);
+                // }
+                // ctx.strokeStyle = 'blue';
+                // ctx.lineWidth = 2;
+                // ctx.stroke();
+                
+                // ctx.beginPath();
+                // ctx.moveTo(hitterCoords.x, hitterCoords.y);
+                // if (hitterCoords.y >= 0 ) {
+                //     ctx.lineTo(frontLeftCornerCoords.x, frontLeftCornerCoords.y);
+                // } else {
+                //     ctx.lineTo(backLeftCornerCoords.x, backLeftCornerCoords.y);
+                // }
+                // ctx.strokeStyle = 'yellow';
+                // ctx.lineWidth = 2;
+                // ctx.stroke();
+                // ctx.beginPath();
+                points = []
+                points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy})
+                
+                ctx.beginPath();
+                ctx.moveTo(hitterCoords.x, hitterCoords.y);
+                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.topx, returnerBlockingCoords.topy, 780,0,781,400);
+                //console.log(`intersectionPoint (${intersectionPoint.x}, ${intersectionPoint.y})`);
+                ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
+                points.push({x: intersectionPoint.x, y: intersectionPoint.y});
+                ctx.strokeStyle = 'gray';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(hitterCoords.x, hitterCoords.y);
+                //ctx.lineTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
+                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.botx, returnerBlockingCoords.boty, 780,0,781,400);
+                ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
+                points.push({x: intersectionPoint.x, y: intersectionPoint.y});
+                ctx.strokeStyle = 'gray';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                points.push({x: returnerBlockingCoords.botx, y: returnerBlockingCoords.boty})
+                points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy})
+
+                drawPolygon(points, 'rgba(0, 0, 0, 0.4)');
+
+                // ctx.beginPath();
+                // ctx.moveTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
+                // netBoundingCoords = getBoundingCoords(net);
+                // netIntersept = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.botx, returnerBlockingCoords.boty, netBoundingCoords.topx, netBoundingCoords.topy, netBoundingCoords.botx, netBoundingCoords.boty);
+                // ctx.lineTo(netIntersept.x, netIntersept.y);
+                // ctx.strokeStyle = 'red';
+                // ctx.lineWidth = 2;
+                // ctx.stroke();
+
+            }
+
+            function updatePlayerPosition(player, event) {
+                const rect = court.getBoundingClientRect();
+                player.style.left = `${event.pageX - rect.left - player.offsetWidth / 2}px`;
+                player.style.top = `${event.pageY - rect.top - player.offsetHeight / 2}px`;
+                drawLineOfSight();
+            }
+
+            [hitter, returner].forEach(player => {
+                player.draggable = true;
+                player.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', null);
+                });
+                player.addEventListener('dragend', (e) => {
+                    updatePlayerPosition(player, e);
+                });
+            });
+            toggleSwitch.addEventListener('change', drawLineOfSight);
+            
+            drawLineOfSight(); // Initial draw
+        });
+    </script>
+</body>
+</html>
