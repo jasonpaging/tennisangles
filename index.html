@@ -8,23 +8,24 @@
 </head>
 <body>
     <div>
-        <label for="handednessToggle">Left-handed</label>
+    <div class="options" style="top: -100px">
+        <label for="handednessToggle">Left-handed hitter</label>
         <input type="checkbox" id="handednessToggle">
-        <label for="handednessToggle">Right-handed</label>
-        <p></p>
     </div>
-        <div class="court" id="court">
-            <!-- <canvas id="courtCanvas" width="980" height="560" style="top: -100px; left: -100px"></canvas> -->
-            <canvas id="courtCanvas" width="780" height="360"></canvas>
-            <div class="canvas-box" style="top: -100px; left: -100px"></div>
-            <div class="service-boxes"></div>
-            <div class="center-line"></div>
-            <div class="doubles-alley" style="top: -2px; left: -2px;"></div>
-            <div class="doubles-alley" style="bottom: -2px; left: -2px;"></div>
-            <div class="net"></div>
-            <div class="player" id="hitter" style="left: 100px; top: 150px;"></div>
-            <div class="player" id="returner" style="left: 450px; top: 100px;"></div>
-        </div>
+    <br>
+    <div class="court" id="court">
+        <!-- <canvas id="courtCanvas" width="980" height="560" style="top: -100px; left: -100px"></canvas> -->
+        <canvas id="courtCanvas" width="780" height="360"></canvas>
+        <div class="canvas-box" style="top: -100px; left: -100px"></div>
+        <div class="service-boxes"></div>
+        <div class="center-line"></div>
+        <div class="doubles-alley" style="top: -2px; left: -2px;"></div>
+        <div class="doubles-alley" style="bottom: -2px; left: -2px;"></div>
+        <div class="net"></div>
+        <div class="player" id="hitter" style="left: 100px; top: 150px;"></div>
+        <div class="player" id="returner" style="left: 450px; top: 100px;"></div>
+    </div>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const toggleSwitch = document.getElementById('handednessToggle');
@@ -36,13 +37,9 @@
             const returner = document.getElementById('returner');
             
             const courtRect = court.getBoundingClientRect();            
+            console.log(`courtRect.x ${courtRect.x} courtRect.y ${courtRect.y}, courtRect.width ${courtRect.width}, courtRect.height ${courtRect.height}, courtRect.left ${courtRect.left}, courtRect.top ${courtRect.top}, courtRect.right ${courtRect.right}, courtRect.bottom ${courtRect.bottom}`);
             const netRect = net.getBoundingClientRect();
             
-            const backRightCornerCoords = { x: 780, y: 360 };
-            const backLeftCornerCoords = { x: 780, y: 0 };
-            const frontRightCornerCoords = { x: 390, y: 360 };
-            const frontLeftCornerCoords = { x: 390, y: 0 };
-
             function getCoordinates(obj) {
                 const rect = obj.getBoundingClientRect();
                 return {
@@ -56,7 +53,7 @@
                 return {
                     topx: rect.left - courtRect.left,
                     topy: rect.top - courtRect.top,
-                    botx: rect.left - courtRect.left + rect.width,
+                    botx: rect.right - courtRect.left,
                     boty: rect.bottom - courtRect.top
                 };
             }
@@ -88,7 +85,7 @@
                 const slopeA = (y2 - y1) / (x2 - x1);
                 const interceptA = y1 - slopeA * x1;
                 const slopeB = (y4 - y3) / (x4 - x3);
-                console.log(`slopeA ${slopeA} interceptA ${interceptA} slopeB ${slopeB}`);
+
                 const interceptB = y3 - slopeB * x3;
                 const x = (interceptB - interceptA) / (slopeA - slopeB);
                 const y = slopeA * x + interceptA;
@@ -118,29 +115,6 @@
                 const returnerBlockingCoords = getReturnerBlockingCoords(returner);
                 const netCoords = getCoordinates(net);
                 
-                // Example logic to draw lines (can be expanded for detailed calculations)
-                // ctx.beginPath();
-                // ctx.moveTo(hitterCoords.x, hitterCoords.y);
-                // if (hitterCoords.y <= frontRightCornerCoords.y) {
-                //     ctx.lineTo(frontRightCornerCoords.x, frontRightCornerCoords.y);
-                // } else {
-                //     ctx.lineTo(backRightCornerCoords.x, backRightCornerCoords.y);
-                // }
-                // ctx.strokeStyle = 'blue';
-                // ctx.lineWidth = 2;
-                // ctx.stroke();
-                
-                // ctx.beginPath();
-                // ctx.moveTo(hitterCoords.x, hitterCoords.y);
-                // if (hitterCoords.y >= 0 ) {
-                //     ctx.lineTo(frontLeftCornerCoords.x, frontLeftCornerCoords.y);
-                // } else {
-                //     ctx.lineTo(backLeftCornerCoords.x, backLeftCornerCoords.y);
-                // }
-                // ctx.strokeStyle = 'yellow';
-                // ctx.lineWidth = 2;
-                // ctx.stroke();
-                // ctx.beginPath();
                 points = []
                 points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy})
                 

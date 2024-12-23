@@ -7,6 +7,14 @@ body {
     background-color: black;
 }
 
+.options {
+    position: relative;
+    width: 780px;
+    height: 22px;
+    background-color: rgb(69, 73, 69);
+    
+}
+
 .court {
     position: relative;
     width: 780px; /* 78 feet */
@@ -79,4 +87,6 @@ body {
     cursor: pointer;
 }
 
-#handednessToggle { margin: 10px; }
+#handednessToggle { 
+    margin: 3px; 
+}
