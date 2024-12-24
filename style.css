@@ -9,59 +9,68 @@ body {
 
 .options {
     position: relative;
-    width: 780px;
-    height: 22px;
+    width: 80vw;
+    height: calc(80vw * (22/780));
+    top: calc(80vw * (-50/780));
     background-color: rgb(69, 73, 69);
-    
 }
 
 .court {
     position: relative;
-    width: 780px; /* 78 feet */
-    height: 360px; /* 36 feet */
+    width: 80vw; /*780px; 78 feet */
+    height: calc(80vw * (360/780)); /* 360px; 36 feet */
     background-color: green;
     border: 2px solid white;
+    box-sizing: border-box;
+    padding: 0px;
 }
 
-.canvas-box {
+canvas {
     position: absolute;
-    width: 980px;
-    height: 560px;
-    border: 2px solid rgb(88, 88, 88);
+    width: 100%;
+    height: 100%;
 }
 
 .service-boxes {
     position: absolute;
-    width: 416px;
-    height: 266px;
+    width: calc(80vw * (420/780));
+    height: calc(80vw * (272/780));
     border: 2px solid white;
-    top: 45px; 
-    left: 180px;
+    top: calc(80vw * (44/780)); 
+    left: calc(80vw * (180/780));
+    box-sizing: border-box;
+    padding: 0px;
 }
 
 .net {
     position: absolute;
     width: 0;
-    height: 420px;
+    height: calc(80vw *(420/780));
     border-left: 2px solid white;
-    left: 390px; /* Half the court width */
-    top: -30px;
+    left: 40vw; /* Half the court width */
+    top: calc(80vw * (-30/780));
 }
 
 .doubles-alley {
     position: absolute;
-    width: 780px;
-    height: 45px;
+    width: 80vw;
+    height: calc(80vw * (272/780));
     border: 2px solid white;
+    box-sizing: border-box;
+    padding: 0px;
+    top: calc(80vw * (44/780));
+    left: -2px;
 }
 
 .center-line {
     position: absolute;
-    width: 420px; /* Matches the court width */
+    width: calc(80vw * (420/780)); /* Matches the court width */
     height: 0;
     border-top: 2px solid white;
-    top: 180px; /* Half the court height */
-    left: 180px;
+    top: calc(80vw *(180/780)); /* Half the court height */
+    left: calc(80vw *(180/780));
+    box-sizing: border-box;
+    padding: 0px;
 }
 
 
@@ -71,20 +80,25 @@ body {
 
 #hitter {
     position: absolute;
-    width: 20px;
-    height: 60px;
+    width: calc(80vw *(20/780));
+    height: calc(80vw *(60/780));
     background-color: yellow;
     border-radius: 50%;
     cursor: pointer;
+    left: calc(80vw *(120/780));
+    top: calc(80vw *(100/780));
 }
 
 #returner {
     position: absolute;
-    width: 20px;
-    height: 60px;
+    width: calc(80vw *(20/780));
+    height: calc(80vw *(60/780));
     background-color: blue;
     border-radius: 50%;
     cursor: pointer;
+    left: calc(80vw *(420/780));
+    top: calc(80vw *(180/780));
+
 }
 
 #handednessToggle { 
