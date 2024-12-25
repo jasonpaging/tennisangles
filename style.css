@@ -3,24 +3,23 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    max-height: 100vh;
     margin: 0;
     background-color: black;
 }
 
 .options {
     position: relative;
-    width: 80vw;
-    height: calc(80vw * (22/780));
-    top: calc(80vw * (-30/780));
+    width: fit-content;
+    /* height: calc(80vw * (22/780)); */
+    /* top: calc(80vw * (-30/780)); */
     background-color: lightblue;
-    margin: 2vw;
-    font-size: 2vw;
+    font-size: small;
 }
 
 #scenarioSelector { 
-    margin-left: 1vw; 
-    padding: 1vw; 
-    font-size: 1vw;
+    font-size: small;
+    height: max-content;
 }
 
 .court {
@@ -89,12 +88,12 @@ canvas {
 #hitter {
     position: absolute;
     width: calc(80vw *(20/780));
-    height: calc(80vw *(30/780));
+    height: calc(80vw *(40/780));
     background-color: yellow;
     border-radius: 50%;
     cursor: pointer;
     left: calc(80vw *(100/780));
-    top: calc(80vw *(165/780));
+    top: calc(80vw *(160/780));
 }
 
 #returner {
