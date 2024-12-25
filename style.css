@@ -81,12 +81,12 @@ canvas {
 #hitter {
     position: absolute;
     width: calc(80vw *(20/780));
-    height: calc(80vw *(60/780));
+    height: calc(80vw *(30/780));
     background-color: yellow;
     border-radius: 50%;
     cursor: pointer;
-    left: calc(80vw *(120/780));
-    top: calc(80vw *(100/780));
+    left: calc(80vw *(100/780));
+    top: calc(80vw *(165/780));
 }
 
 #returner {
@@ -96,8 +96,8 @@ canvas {
     background-color: blue;
     border-radius: 50%;
     cursor: pointer;
-    left: calc(80vw *(420/780));
-    top: calc(80vw *(180/780));
+    left: calc(80vw *(450/780));
+    top: calc(80vw *(150/780));
 
 }
 

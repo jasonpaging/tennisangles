@@ -32,7 +32,7 @@
             const ctx = canvas.getContext('2d');
             const hitter = document.getElementById('hitter');
             const returner = document.getElementById('returner');
-   
+               
             //const canvasRect = canvas.getBoundingClientRect();
 
             function toXCanvas(i, courtRect){
@@ -46,12 +46,12 @@
             function getCoordinates(obj, courtRect) {
                 const rect = obj.getBoundingClientRect();
                 return {
-                    x: (rect.left -courtRect.left + rect.width / 2),
-                    y: (rect.top -courtRect.top + rect.height / 2)
+                    x: (rect.left - courtRect.left + rect.width / 2),
+                    y: (rect.top - courtRect.top + rect.height / 2)
                 };
             }
 
-            function getCoordinatesWithHandedness(coords,player="hitter",side="right"){
+            function getCoordinatesWithHandedness(coords,player="hitter",side="right", hitterHandedAdjustment=0) {
                 playerAdj = 1;
                 sideAdj = -1
                 if (player==="hitter"){
@@ -60,7 +60,7 @@
                 if (side==="left"){
                         sideAdj = 1;
                     }                    
-                coords.y = coords.y + (20 * playerAdj * sideAdj)
+                coords.y = coords.y + (hitterHandedAdjustment *.8 * playerAdj * sideAdj)
                 return coords;
             }
 
@@ -150,10 +150,15 @@
 
                 const returnerRect = returner.getBoundingClientRect();    
                 const returnerCoords = getCoordinates(returner, courtRect);
+
+                const hitterRect = hitter.getBoundingClientRect();
+                const hitterHandedAdjustment = hitterRect.height /2;
                 const hitterHandedness = toggleSwitch.checked ? 'left' : 'right';
-                const hitterCoords = getCoordinatesWithHandedness(getCoordinates(hitter, courtRect),"hitter",hitterHandedness);
+                const hitterCenter = getCoordinates(hitter, courtRect);
+                const hitterCoords = getCoordinatesWithHandedness(getCoordinates(hitter, courtRect),"hitter",hitterHandedness, hitterHandedAdjustment);
+
                 // Calculate the angle between hitter and returner 
-                const facingAngle = Math.atan2(returnerCoords.y - hitterCoords.y, returnerCoords.x - hitterCoords.x) * 180 / Math.PI; 
+                const facingAngle = Math.atan2(returnerCoords.y - hitterCenter.y, returnerCoords.x - hitterCenter.x) * 180 / Math.PI; 
                 // Apply rotation to the returner 
                 returner.style.transform = `rotate(${facingAngle}deg)`; 
                 const returnerRectRotated = getRotatedBoundingBox(returnerRect.left - courtRect.left, returnerRect.top - courtRect.top, returnerRect.width, returnerRect.height, -1* facingAngle);
@@ -194,11 +199,10 @@
                 ctx.beginPath();
                 ctx.moveTo(returnerBlockingCoords.topx, returnerBlockingCoords.topy);
                 points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy});
-                newX = returnerBlockingCoords.topx + playerDistance/6;
-                newY = returnerBlockingCoords.topy - playerDistance/6;
-                ctx.lineTo(newX, newY);
-                points.push({x: newX, y: newY});
-                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, newX, newY, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+                strafeCoords = getPointFromAngle(returnerBlockingCoords.topx, returnerBlockingCoords.topy, facingAngle - 45, playerDistance/5);
+                ctx.lineTo(strafeCoords.x, strafeCoords.y);
+                points.push({x: strafeCoords.x, y: strafeCoords.y});
+                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
                 ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
                 points.push({x: intersectionPoint.x, y: intersectionPoint.y});
                 ctx.strokeStyle = 'gray';
@@ -207,13 +211,12 @@
 
                 ctx.beginPath();
                 ctx.moveTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
-                newX = returnerBlockingCoords.botx + playerDistance/6;
-                newY = returnerBlockingCoords.boty + playerDistance/6;
-                ctx.lineTo(newX, newY);
-                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, newX, newY, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+                strafeCoords = getPointFromAngle(returnerBlockingCoords.botx, returnerBlockingCoords.boty, facingAngle + 45, playerDistance/5);
+                ctx.lineTo(strafeCoords.x, strafeCoords.y);
+                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
                 ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
                 points.push({x: intersectionPoint.x, y: intersectionPoint.y});
-                points.push({x: newX, y: newY});
+                points.push({x: strafeCoords.x, y: strafeCoords.y});
                 points.push({x: returnerBlockingCoords.botx, y: returnerBlockingCoords.boty});
                 ctx.strokeStyle = 'gray';
                 ctx.lineWidth = 1;
