@@ -13,12 +13,14 @@ body {
     height: calc(80vw * (22/780));
     top: calc(80vw * (-30/780));
     background-color: lightblue;
-    margin: 5px;
+    margin: 2vw;
+    font-size: 2vw;
 }
 
 #scenarioSelector { 
-    margin-left: 5px; 
-    padding: 0; 
+    margin-left: 1vw; 
+    padding: 1vw; 
+    font-size: 1vw;
 }
 
 .court {

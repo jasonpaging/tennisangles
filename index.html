@@ -284,6 +284,22 @@
                 canvas.height = court.clientHeight; 
                 drawLineOfSight(); // Redraw on resize 
             }
+
+            function handleTouchMove(event) {
+                const touch = event.touches[0];
+                updatePlayerPosition(event.target, { pageX: touch.pageX, pageY: touch.pageY });
+            }
+
+            function handleTouchEnd(event) {
+                event.target.removeEventListener('touchmove', handleTouchMove);
+                event.target.removeEventListener('touchend', handleTouchEnd);
+            }
+
+            function handleTouchStart(event) {
+                event.preventDefault();
+                event.target.addEventListener('touchmove', handleTouchMove);
+                event.target.addEventListener('touchend', handleTouchEnd);
+            }
             
             window.addEventListener('resize', resizeCanvas);
             
@@ -295,6 +311,7 @@
                 player.addEventListener('dragend', (e) => {
                     updatePlayerPosition(player, e);
                 });
+                player.addEventListener('touchstart', handleTouchStart);
             });
             
             toggleSwitch.addEventListener('change', drawLineOfSight);
