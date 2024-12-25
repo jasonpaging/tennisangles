@@ -11,8 +11,14 @@ body {
     position: relative;
     width: 80vw;
     height: calc(80vw * (22/780));
-    top: calc(80vw * (-50/780));
-    background-color: rgb(69, 73, 69);
+    top: calc(80vw * (-30/780));
+    background-color: lightblue;
+    margin: 5px;
+}
+
+#scenarioSelector { 
+    margin-left: 5px; 
+    padding: 0; 
 }
 
 .court {
@@ -92,12 +98,12 @@ canvas {
 #returner {
     position: absolute;
     width: calc(80vw *(20/780));
-    height: calc(80vw *(60/780));
+    height: calc(80vw *(40/780));
     background-color: blue;
     border-radius: 50%;
     cursor: pointer;
     left: calc(80vw *(450/780));
-    top: calc(80vw *(150/780));
+    top: calc(80vw *(160/780));
 
 }
 

@@ -9,6 +9,13 @@
 <body>
     <div>
         <div class="options">
+            <label for="scenarioSelector">Scenario</label>
+            <select id="scenarioSelector">
+                <option value="Scenario0">Default</option>
+                <option value="Scenario1">Net players in corner</option>
+                <option value="Scenario2">Net Players on returning serve</option>
+                <option value="Scenario3">Net Player on Serve</option>
+            </select>
             <label for="handednessToggle">Left/Back -handed hitter</label>
             <input type="checkbox" id="handednessToggle">
         </div>
@@ -236,6 +243,42 @@
                 drawLineOfSight();
             }
 
+            function handlePlayerSelection(event) { 
+                const scenario = event.target.value; 
+                switch (scenario) { 
+                    case 'Scenario0': 
+                        hitter.style.left = 'calc(80vw *(100/780))';
+                        hitter.style.top = 'calc(80vw *(165/780))'; 
+                        returner.style.left = 'calc(80vw *(450/780))'; 
+                        returner.style.top = 'calc(80vw *(160/780))'; 
+                        toggleSwitch.checked = false;
+                        break; 
+                    case 'Scenario1': 
+                        hitter.style.left = 'calc(80vw *(330/780))'; 
+                        hitter.style.top = 'calc(80vw *(5/780))'; 
+                        returner.style.left = 'calc(80vw *(450/780))'; 
+                        returner.style.top = 'calc(80vw *(30/780))'; 
+                        toggleSwitch.checked = true;
+                        break; 
+                    case 'Scenario2': 
+                        hitter.style.left = 'calc(80vw *(330/780))'; 
+                        hitter.style.top = 'calc(80vw *(60/780))'; 
+                        returner.style.left = 'calc(80vw *(570/780))'; 
+                        returner.style.top = 'calc(80vw *(185/780))'; 
+                        toggleSwitch.checked = false;
+                        break; 
+                    case 'Scenario3': 
+                        hitter.style.left = 'calc(80vw *(-10/780))'; 
+                        hitter.style.top = 'calc(80vw *(300/780))'; 
+                        returner.style.left = 'calc(80vw *(450/780))'; 
+                        returner.style.top = 'calc(80vw *(275/780))'; 
+                        toggleSwitch.checked = false;
+                        break; 
+                }
+
+                drawLineOfSight();
+            }
+
             function resizeCanvas() { 
                 canvas.width = court.clientWidth; 
                 canvas.height = court.clientHeight; 
@@ -255,6 +298,7 @@
             });
             
             toggleSwitch.addEventListener('change', drawLineOfSight);
+            scenarioSelector.addEventListener('change', handlePlayerSelection);
 
             resizeCanvas(); // Initial call to set canvas size
             drawLineOfSight(); // Initial draw
