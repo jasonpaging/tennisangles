@@ -113,8 +113,8 @@ canvas {
 }
 
 #tennisball { 
-    width: 30px; /* Adjust the size as needed */ 
-    height: 30px; 
+    width: calc(80vw *(20/780)); /* Adjust the size as needed */ 
+    height: calc(80vw *(20/780)); 
     background-image: url('tennisball.png'); 
     background-size: contain; 
     background-repeat: no-repeat; 

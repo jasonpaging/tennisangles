@@ -164,7 +164,7 @@
                 const hitterCenter = getCoordinates(hitter, courtRect);
                 const hitterCoords = getCoordinatesWithHandedness(getCoordinates(hitter, courtRect),"hitter",hitterHandedness, hitterHandedAdjustment);
 
-                tennisball.style.left = `${hitterRect.left - courtRect.left + (hitterRect.width * 2)}px`;
+                tennisball.style.left = `${hitterRect.left - courtRect.left + (hitterRect.width * 1.5)}px`;
                 if (hitterHandedness == 'right') {
                     tennisball.style.top = `${hitterRect.bottom - courtRect.top }px`;
                 } else {
