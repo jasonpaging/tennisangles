@@ -25,7 +25,7 @@ body {
 .court {
     position: relative;
     width: 80vw; /*780px; 78 feet */
-    height: calc(80vw * (360/780)); /* 360px; 36 feet */
+    aspect-ratio: 78/36; /* 360px; 36 feet */
     background-color: green;
     border: 2px solid white;
     box-sizing: border-box;
@@ -41,7 +41,7 @@ canvas {
 .service-boxes {
     position: absolute;
     width: calc(80vw * (420/780));
-    height: calc(80vw * (272/780));
+    aspect-ratio: 420/272;
     border: 2px solid white;
     top: calc(80vw * (44/780)); 
     left: calc(80vw * (180/780));
@@ -110,4 +110,16 @@ canvas {
 
 #handednessToggle { 
     margin: 3px; 
+}
+
+#tennisball { 
+    width: 30px; /* Adjust the size as needed */ 
+    height: 30px; 
+    background-image: url('tennisball.png'); 
+    background-size: contain; 
+    background-repeat: no-repeat; 
+    position: absolute; 
+    top: 50%; /* Initial position */ 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
 }

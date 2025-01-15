@@ -15,11 +15,9 @@
                 <option value="Scenario2">Net Players during serve</option>
                 <option value="Scenario3">Net player on serve returner</option>
             </select>
-            <br>
             <label for="handednessToggle">Lefty</label>
             <input type="checkbox" id="handednessToggle">
         </div>
-        <br>
         <div class="court" id="court">
             <canvas id="courtCanvas"></canvas>
             <div class="service-boxes"></div>
@@ -28,6 +26,7 @@
             <div class="net"></div>
             <div class="player" id="hitter"></div>
             <div class="player" id="returner" ></div>
+            <div id="tennisball"></div>
         </div>
     </div>
     <script>
@@ -39,7 +38,8 @@
             const ctx = canvas.getContext('2d');
             const hitter = document.getElementById('hitter');
             const returner = document.getElementById('returner');
-               
+            const tennisball = document.getElementById('tennisball');
+              
             //const canvasRect = canvas.getBoundingClientRect();
 
             function toXCanvas(i, courtRect){
@@ -164,6 +164,13 @@
                 const hitterCenter = getCoordinates(hitter, courtRect);
                 const hitterCoords = getCoordinatesWithHandedness(getCoordinates(hitter, courtRect),"hitter",hitterHandedness, hitterHandedAdjustment);
 
+                tennisball.style.left = `${hitterRect.left - courtRect.left + (hitterRect.width * 2)}px`;
+                if (hitterHandedness == 'right') {
+                    tennisball.style.top = `${hitterRect.bottom - courtRect.top }px`;
+                } else {
+                    tennisball.style.top = `${hitterRect.top - courtRect.top }px`;
+                }
+
                 // Calculate the angle between hitter and returner 
                 const facingAngle = Math.atan2(returnerCoords.y - hitterCenter.y, returnerCoords.x - hitterCenter.x) * 180 / Math.PI; 
                 // Apply rotation to the returner 
@@ -172,8 +179,6 @@
                 const returnerBlockingCoords = {topx: returnerRectRotated.midTop.x, topy: returnerRectRotated.midTop.y, botx: returnerRectRotated.midBottom.x, boty: returnerRectRotated.midBottom.y};
 
                 const playerDistance = calculateDistance(hitterCoords.x, hitterCoords.y, returnerCoords.x, returnerCoords.y);
-
-
 
                 points = []
 
@@ -234,6 +239,7 @@
 
                 console.log(`courtRect.width ${courtRect.width}, courtRect.height ${courtRect.height}, courtRect.left ${courtRect.left}, courtRect.top ${courtRect.top}, courtRect.right ${courtRect.right}, courtRect.bottom ${courtRect.bottom}`);
                 console.log(`canvas.width ${canvas.width}, canvas.height ${canvas.height}`);
+
             }
             
             function updatePlayerPosition(player, event) {
@@ -250,7 +256,7 @@
                         hitter.style.left = 'calc(80vw *(100/780))';
                         hitter.style.top = 'calc(80vw *(165/780))'; 
                         returner.style.left = 'calc(80vw *(450/780))'; 
-                        returner.style.top = 'calc(80vw *(160/780))'; 
+                        returner.style.top = 'calc(80vw *(160/780))';
                         toggleSwitch.checked = false;
                         break; 
                     case 'Scenario1': 
@@ -275,7 +281,6 @@
                         toggleSwitch.checked = false;
                         break; 
                 }
-
                 drawLineOfSight();
             }
 
@@ -302,6 +307,39 @@
             }
             
             window.addEventListener('resize', resizeCanvas);
+            
+            // Function to prevent default touch events
+            function preventTouchScroll(event) {
+                event.preventDefault();
+            }
+
+            // Add event listeners to disable scroll during drag
+            function addTouchListeners() {
+            document.addEventListener('touchstart', preventTouchScroll, { passive: false });
+            document.addEventListener('touchmove', preventTouchScroll, { passive: false });
+            document.addEventListener('touchend', preventTouchScroll, { passive: false });
+            }
+
+            // Remove event listeners to enable scroll after drag
+            function removeTouchListeners() {
+            document.removeEventListener('touchstart', preventTouchScroll);
+            document.removeEventListener('touchmove', preventTouchScroll);
+            document.removeEventListener('touchend', preventTouchScroll);
+            }
+
+            // Example of initializing drag operation
+            function startDrag() {
+            addTouchListeners();
+            // Your drag logic here
+            }
+
+            // Example of ending drag operation
+            function endDrag() {
+            removeTouchListeners();
+            // Your end drag logic here
+            }
+
+
             
             [hitter, returner].forEach(player => {
                 player.draggable = true;
