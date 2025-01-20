@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passing Shot Shadow</title>
+    <link rel="stylesheet" href="./shared/styles.css">
+    <link rel="stylesheet" href="./passingshadow/custom.css">
+
+</head>
+<body>
+    <div>
+        <div class="options">
+            <select id="scenarioSelector">
+                <option value="Scenario0">Default Scenario</option>
+                <option value="Scenario1">Alley Close to Net</option>
+                <option value="Scenario2">Baseline and net player</option>
+            </select>
+            <label for="handednessToggle">Lefty</label>
+            <input type="checkbox" id="handednessToggle">
+        </div>
+        <div class="court" id="court">
+            <canvas id="courtCanvas"></canvas>
+            <div class="service-boxes"></div>
+            <div class="center-line"></div>
+            <div class="doubles-alley"></div>
+            <div id="tennisball"></div>
+            <div class="net"></div>
+            <div class="description unselectable">Passing Shot Shadow</div>       
+        </div>
+        <div id="hitter1"></div>
+        <div id="returner1"></div>
+
+    </div>
+    <script>
+
+    </script>
+    <script src="./shared/calc.js"></script>
+    <script src="./shared/drawing.js"></script>
+    <script src="./passingshadow/passingshadow.js"></script>
+</body>
+</html>
