@@ -11,9 +11,8 @@
         <div class="options">
             <select id="scenarioSelector">
                 <option value="Scenario0">Default Scenario</option>
-                <option value="Scenario1">Net players in corner</option>
-                <option value="Scenario2">Net Players during serve</option>
-                <option value="Scenario3">Net player on serve returner</option>
+                <option value="Scenario1">Alley Close to Net</option>
+                <option value="Scenario2">Baseline and net player</option>
             </select>
             <label for="handednessToggle">Lefty</label>
             <input type="checkbox" id="handednessToggle">
@@ -23,11 +22,13 @@
             <div class="service-boxes"></div>
             <div class="center-line"></div>
             <div class="doubles-alley"></div>
-            <div class="net"></div>
-            <div class="player" id="hitter"></div>
-            <div class="player" id="returner" ></div>
             <div id="tennisball"></div>
+            <div class="net"></div>
+            <div class="description">Passing Shot Shadow</div>       
         </div>
+        <div id="hitter1"></div>
+        <div id="returner1"></div>
+
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -36,9 +37,9 @@
             const net = document.querySelector('.net');
             const canvas = document.getElementById('courtCanvas');
             const ctx = canvas.getContext('2d');
-            const hitter = document.getElementById('hitter');
-            const returner = document.getElementById('returner');
-            const tennisball = document.getElementById('tennisball');
+            const tennisBall = document.getElementById('tennisball');
+            const hitter1 = document.getElementById('hitter1');
+            const returner1 = document.getElementById('returner1');
               
             //const canvasRect = canvas.getBoundingClientRect();
 
@@ -53,8 +54,8 @@
             function getCoordinates(obj, courtRect) {
                 const rect = obj.getBoundingClientRect();
                 return {
-                    x: (rect.left - courtRect.left + rect.width / 2),
-                    y: (rect.top - courtRect.top + rect.height / 2)
+                    x: (rect.left - courtRect.left + (rect.width /2)),
+                    y: (rect.top - courtRect.top + (rect.height /3))
                 };
             }
 
@@ -67,11 +68,11 @@
                 if (side==="left"){
                         sideAdj = 1;
                     }                    
-                coords.y = coords.y + (hitterHandedAdjustment *.8 * playerAdj * sideAdj)
+                coords.y = coords.y + (hitterHandedAdjustment *.7 * playerAdj * sideAdj)
                 return coords;
             }
 
-            function calculateDistance(x1, y1, x2, y2) { 
+            function getDistanceBetweenPoints(x1, y1, x2, y2) { 
                 const deltaX = x2 - x1; 
                 const deltaY = y2 - y1; 
                 return Math.sqrt(deltaX * deltaX + deltaY * deltaY); 
@@ -112,7 +113,7 @@
                 };
             }
 
-            function calculateLinesIntersection(x1, y1, x2, y2, x3, y3, x4, y4) {
+            function getLinesIntersectionPoint(x1, y1, x2, y2, x3, y3, x4, y4) {
                 const slopeA = (y2 - y1) / (x2 - x1);
                 const interceptA = y1 - slopeA * x1;
                 const slopeB = (y4 - y3) / (x4 - x3);
@@ -122,6 +123,7 @@
                 const y = slopeA * x + interceptA;
                 return { x: x, y: y };
             }
+
 
             function drawPolygon(points, fillColor) {
                 ctx.beginPath();
@@ -148,45 +150,52 @@
                 return { x: x2, y: y2 };
 
             }
-            
+
             function drawLineOfSight() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
                 const courtRect = court.getBoundingClientRect();
                 const targetBaselineTop = { x: courtRect.right, y: courtRect.top };
                 const targetBaselineBottom = { x: courtRect.right + 1, y: courtRect.top + courtRect.height };     
 
-                const returnerRect = returner.getBoundingClientRect();    
-                const returnerCoords = getCoordinates(returner, courtRect);
+                const returnerRect = returner1.getBoundingClientRect();    
+                const returnerCoords = getCoordinates(returner1, courtRect);
 
-                const hitterRect = hitter.getBoundingClientRect();
+                const hitterRect = hitter1.getBoundingClientRect();
                 const hitterHandedAdjustment = hitterRect.height /2;
                 const hitterHandedness = toggleSwitch.checked ? 'left' : 'right';
-                const hitterCenter = getCoordinates(hitter, courtRect);
-                const hitterCoords = getCoordinatesWithHandedness(getCoordinates(hitter, courtRect),"hitter",hitterHandedness, hitterHandedAdjustment);
+                const hitterCenter = getCoordinates(hitter1, courtRect);
 
-                tennisball.style.left = `${hitterRect.left - courtRect.left + (hitterRect.width * 1.5)}px`;
+                tennisBall.style.left = `${hitterRect.left - courtRect.left + (hitterRect.width * 1)}px`;
                 if (hitterHandedness == 'right') {
-                    tennisball.style.top = `${hitterRect.bottom - courtRect.top }px`;
+                    tennisBall.style.top = `${hitterRect.bottom - (hitterRect.height * .2) - courtRect.top}px`;
+                    hitter1Scale = 1;
+                    hitter1Deg = 0;
                 } else {
-                    tennisball.style.top = `${hitterRect.top - courtRect.top }px`;
+                    tennisBall.style.top = `${hitterRect.top + (hitterRect.height * .1) - courtRect.top}px`;
+                    hitter1Scale = -1;
+                    hitter1Deg = 180;
                 }
+                const hitterCoords = getCoordinates(tennisBall, courtRect);
 
                 // Calculate the angle between hitter and returner 
                 const facingAngle = Math.atan2(returnerCoords.y - hitterCenter.y, returnerCoords.x - hitterCenter.x) * 180 / Math.PI; 
-                // Apply rotation to the returner 
-                returner.style.transform = `rotate(${facingAngle}deg)`; 
+                // Calculate rotation to the returner 
                 const returnerRectRotated = getRotatedBoundingBox(returnerRect.left - courtRect.left, returnerRect.top - courtRect.top, returnerRect.width, returnerRect.height, -1* facingAngle);
                 const returnerBlockingCoords = {topx: returnerRectRotated.midTop.x, topy: returnerRectRotated.midTop.y, botx: returnerRectRotated.midBottom.x, boty: returnerRectRotated.midBottom.y};
 
-                const playerDistance = calculateDistance(hitterCoords.x, hitterCoords.y, returnerCoords.x, returnerCoords.y);
+                // Move sprites
+                returner1.style.transform = `rotate(${facingAngle}deg)`;
+                hitter1.style.transform = `scaleX(${hitter1Scale}) rotate(${hitter1Deg}deg)`;
+
+                const playerDistance = getDistanceBetweenPoints(hitterCoords.x, hitterCoords.y, returnerCoords.x, returnerCoords.y);
 
                 points = []
-
+                // Lines from the tennisball to the returner (light gray lines)
                 ctx.beginPath();
                 ctx.moveTo(hitterCoords.x, hitterCoords.y);
                 ctx.lineTo(returnerBlockingCoords.topx, returnerBlockingCoords.topy);
                 points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy});
-                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.topx, returnerBlockingCoords.topy, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+                intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.topx, returnerBlockingCoords.topy, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
                 points.push({x: intersectionPoint.x, y: intersectionPoint.y});
                 ctx.strokeStyle = 'gray';
                 ctx.lineWidth = 1;
@@ -195,7 +204,7 @@
                 ctx.beginPath();
                 ctx.moveTo(hitterCoords.x, hitterCoords.y);
                 ctx.lineTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
-                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.botx, returnerBlockingCoords.boty, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+                intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.botx, returnerBlockingCoords.boty, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
                 points.push({x: intersectionPoint.x, y: intersectionPoint.y});
                 points.push({x: returnerBlockingCoords.botx, y: returnerBlockingCoords.boty});
                 // complete polygon points
@@ -204,6 +213,7 @@
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
+                // polygon that extends the lines from the tennis ball behind the returner and shades the area dark gray
                 drawPolygon(points, 'rgba(0, 0, 0, 0.2)');
                 points = []
 
@@ -211,10 +221,11 @@
                 ctx.beginPath();
                 ctx.moveTo(returnerBlockingCoords.topx, returnerBlockingCoords.topy);
                 points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy});
-                strafeCoords = getPointFromAngle(returnerBlockingCoords.topx, returnerBlockingCoords.topy, facingAngle - 45, playerDistance/5);
+                // calculate an extension on both sides of the returner that they can reach/strafe to
+                strafeCoords = getPointFromAngle(returnerBlockingCoords.topx, returnerBlockingCoords.topy, facingAngle - 85, playerDistance/5);
                 ctx.lineTo(strafeCoords.x, strafeCoords.y);
                 points.push({x: strafeCoords.x, y: strafeCoords.y});
-                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+                intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
                 ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
                 points.push({x: intersectionPoint.x, y: intersectionPoint.y});
                 ctx.strokeStyle = 'gray';
@@ -223,9 +234,9 @@
 
                 ctx.beginPath();
                 ctx.moveTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
-                strafeCoords = getPointFromAngle(returnerBlockingCoords.botx, returnerBlockingCoords.boty, facingAngle + 45, playerDistance/5);
+                strafeCoords = getPointFromAngle(returnerBlockingCoords.botx, returnerBlockingCoords.boty, facingAngle + 85, playerDistance/5);
                 ctx.lineTo(strafeCoords.x, strafeCoords.y);
-                intersectionPoint = calculateLinesIntersection(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+                intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
                 ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
                 points.push({x: intersectionPoint.x, y: intersectionPoint.y});
                 points.push({x: strafeCoords.x, y: strafeCoords.y});
@@ -236,48 +247,30 @@
                 
                 points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy});
                 drawPolygon(points, 'rgba(0, 0, 0, 0.4)');
-
-                console.log(`courtRect.width ${courtRect.width}, courtRect.height ${courtRect.height}, courtRect.left ${courtRect.left}, courtRect.top ${courtRect.top}, courtRect.right ${courtRect.right}, courtRect.bottom ${courtRect.bottom}`);
-                console.log(`canvas.width ${canvas.width}, canvas.height ${canvas.height}`);
-
             }
             
-            function updatePlayerPosition(player, event) {
-                const rect = court.getBoundingClientRect();
-                player.style.left = `${event.pageX - rect.left - player.offsetWidth / 2}px`;
-                player.style.top = `${event.pageY - rect.top - player.offsetHeight / 2}px`;
-                drawLineOfSight();
-            }
-
             function handlePlayerSelection(event) { 
                 const scenario = event.target.value; 
                 switch (scenario) { 
                     case 'Scenario0': 
-                        hitter.style.left = 'calc(80vw *(100/780))';
-                        hitter.style.top = 'calc(80vw *(165/780))'; 
-                        returner.style.left = 'calc(80vw *(450/780))'; 
-                        returner.style.top = 'calc(80vw *(160/780))';
+                        hitter1.style.left = 'calc(80vw *(100/780))';
+                        hitter1.style.top = 'calc(80vw *(165/780))'; 
+                        returner1.style.left = 'calc(80vw *(600/780))'; 
+                        returner1.style.top = 'calc(80vw *(160/780))';
                         toggleSwitch.checked = false;
                         break; 
                     case 'Scenario1': 
-                        hitter.style.left = 'calc(80vw *(330/780))'; 
-                        hitter.style.top = 'calc(80vw *(5/780))'; 
-                        returner.style.left = 'calc(80vw *(450/780))'; 
-                        returner.style.top = 'calc(80vw *(30/780))'; 
+                        hitter1.style.left = 'calc(80vw *(370/780))'; 
+                        hitter1.style.top = 'calc(80vw *(12/780))'; 
+                        returner1.style.left = 'calc(80vw *(525/780))'; 
+                        returner1.style.top = 'calc(80vw *(100/780))'; 
                         toggleSwitch.checked = true;
                         break; 
                     case 'Scenario2': 
-                        hitter.style.left = 'calc(80vw *(330/780))'; 
-                        hitter.style.top = 'calc(80vw *(60/780))'; 
-                        returner.style.left = 'calc(80vw *(570/780))'; 
-                        returner.style.top = 'calc(80vw *(185/780))'; 
-                        toggleSwitch.checked = false;
-                        break; 
-                    case 'Scenario3': 
-                        hitter.style.left = 'calc(80vw *(-10/780))'; 
-                        hitter.style.top = 'calc(80vw *(300/780))'; 
-                        returner.style.left = 'calc(80vw *(450/780))'; 
-                        returner.style.top = 'calc(80vw *(275/780))'; 
+                        hitter1.style.left = 'calc(80vw *(60/780))'; 
+                        hitter1.style.top = 'calc(80vw *(275/780))'; 
+                        returner1.style.left = 'calc(80vw *(525/780))'; 
+                        returner1.style.top = 'calc(80vw *(250/780))'; 
                         toggleSwitch.checked = false;
                         break; 
                 }
@@ -289,74 +282,58 @@
                 canvas.height = court.clientHeight; 
                 drawLineOfSight(); // Redraw on resize 
             }
-
-            function handleTouchMove(event) {
-                const touch = event.touches[0];
-                updatePlayerPosition(event.target, { pageX: touch.pageX, pageY: touch.pageY });
-            }
-
-            function handleTouchEnd(event) {
-                event.target.removeEventListener('touchmove', handleTouchMove);
-                event.target.removeEventListener('touchend', handleTouchEnd);
-            }
-
-            function handleTouchStart(event) {
-                event.preventDefault();
-                event.target.addEventListener('touchmove', handleTouchMove);
-                event.target.addEventListener('touchend', handleTouchEnd);
-            }
             
-            window.addEventListener('resize', resizeCanvas);
-            
-            // Function to prevent default touch events
-            function preventTouchScroll(event) {
-                event.preventDefault();
-            }
+            [hitter1, returner1].forEach(player => {
+                let offsetX, offsetY;
+                // Touch events
+                player.addEventListener('touchstart', function(e) {
+                    const touch = e.touches[0];
+                    offsetX = touch.clientX - player.getBoundingClientRect().left;
+                    offsetY = touch.clientY - player.getBoundingClientRect().top;
+                }, { passive: false });
+                player.addEventListener('touchmove', function(e) {
+                    const touch = e.touches[0];
+                    const newX = touch.clientX - offsetX;
+                    const newY = touch.clientY - offsetY;
+                    player.style.left = `${newX}px`;
+                    player.style.top = `${newY}px`;
+                    e.preventDefault(); // Prevent scrolling during touchmove
+                    drawLineOfSight();
+                }, { passive: false });
+                player.addEventListener('touchend', function(e) {
+                    // You can handle touchend event here if needed
+                    console.log(`player position: ${player.style.left}, ${player.style.top}`);
+                }, { passive: false });
 
-            // Add event listeners to disable scroll during drag
-            function addTouchListeners() {
-            document.addEventListener('touchstart', preventTouchScroll, { passive: false });
-            document.addEventListener('touchmove', preventTouchScroll, { passive: false });
-            document.addEventListener('touchend', preventTouchScroll, { passive: false });
-            }
-
-            // Remove event listeners to enable scroll after drag
-            function removeTouchListeners() {
-            document.removeEventListener('touchstart', preventTouchScroll);
-            document.removeEventListener('touchmove', preventTouchScroll);
-            document.removeEventListener('touchend', preventTouchScroll);
-            }
-
-            // Example of initializing drag operation
-            function startDrag() {
-            addTouchListeners();
-            // Your drag logic here
-            }
-
-            // Example of ending drag operation
-            function endDrag() {
-            removeTouchListeners();
-            // Your end drag logic here
-            }
-
-
-            
-            [hitter, returner].forEach(player => {
-                player.draggable = true;
-                player.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', null);
+                // Mouse events
+                player.addEventListener('mousedown', function(e) {
+                    offsetX = e.clientX - player.getBoundingClientRect().left;
+                    offsetY = e.clientY - player.getBoundingClientRect().top;
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
                 });
-                player.addEventListener('dragend', (e) => {
-                    updatePlayerPosition(player, e);
-                });
-                player.addEventListener('touchstart', handleTouchStart);
+
+                function onMouseMove(e) {
+                    const newX = e.clientX - offsetX;
+                    const newY = e.clientY - offsetY;
+                    player.style.left = `${newX}px`;
+                    player.style.top = `${newY}px`;
+                    drawLineOfSight();
+                }
+
+                function onMouseUp(e) {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+                
             });
-            
+
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('orientationchange', resizeCanvas);                       
             toggleSwitch.addEventListener('change', drawLineOfSight);
             scenarioSelector.addEventListener('change', handlePlayerSelection);
 
-            resizeCanvas(); // Initial call to set canvas size
-            drawLineOfSight(); // Initial draw
+            resizeCanvas(); // Initial call to set canvas size, draw elements
         });
     </script>
 </body>

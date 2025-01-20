@@ -6,6 +6,7 @@ body {
     max-height: 100vh;
     margin: 0;
     background-color: black;
+    overflow:hidden;
 }
 
 .options {
@@ -80,32 +81,18 @@ canvas {
     padding: 0px;
 }
 
+.description {
+    position: relative;
+    color: lightblue;
+    font-size: calc(80vw * (20/780));
+    top: calc(80vw * (322/780));
+    left: calc(80vw * (10/780));
+    height: calc(80vw *(40/780));
+    font-family: "Arial Black", Gadget, sans-serif;
+}
 
 #court {
     position: relative;
-}
-
-#hitter {
-    position: absolute;
-    width: calc(80vw *(20/780));
-    height: calc(80vw *(40/780));
-    background-color: yellow;
-    border-radius: 50%;
-    cursor: pointer;
-    left: calc(80vw *(100/780));
-    top: calc(80vw *(160/780));
-}
-
-#returner {
-    position: absolute;
-    width: calc(80vw *(20/780));
-    height: calc(80vw *(40/780));
-    background-color: blue;
-    border-radius: 50%;
-    cursor: pointer;
-    left: calc(80vw *(450/780));
-    top: calc(80vw *(160/780));
-
 }
 
 #handednessToggle { 
@@ -113,13 +100,34 @@ canvas {
 }
 
 #tennisball { 
-    width: calc(80vw *(20/780)); /* Adjust the size as needed */ 
-    height: calc(80vw *(20/780)); 
+    width: calc(80vw *(5/780)); /* Adjust the size as needed 20x20 */ 
+    height: calc(80vw *(5/780)); 
     background-image: url('tennisball.png'); 
     background-size: contain; 
     background-repeat: no-repeat; 
     position: absolute; 
-    top: 50%; /* Initial position */ 
-    left: 50%; 
-    transform: translate(-50%, -50%); 
+    touch-action: none;
+}
+
+#hitter1 { 
+    width: calc(80vw *(73/780/1.75)); /* Adjust the size as needed 137x73*/ 
+    height: calc(80vw *(134/780/1.75)); 
+    background-image: url('hitter1.png'); 
+    background-size: contain; 
+    background-repeat: no-repeat; 
+    position: absolute; 
+    left: calc(80vw *(200/780));
+    top: calc(80vw *(260/780));
+    touch-action: none;
+    
+}
+
+#returner1 { 
+    width: calc(80vw *(329/780/4.7)); /* Adjust the size as needed 196x329 */ 
+    height: calc(80vw *(196/780/4.7)); 
+    background: url('returner1.png') no-repeat center center / contain; 
+    position: absolute;
+    left: calc(80vw *(600/780));
+    top: calc(80vw *(260/780));
+    touch-action: none;
 }
