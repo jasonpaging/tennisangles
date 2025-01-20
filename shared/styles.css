@@ -124,7 +124,7 @@ canvas {
     background-repeat: no-repeat; 
     position: absolute; 
     left: calc(80vw *(200/780));
-    top: calc(80vw *(260/780));
+    top: calc(50vh);
     touch-action: none;
     
 }
@@ -135,6 +135,6 @@ canvas {
     background: url('returner1.png') no-repeat center center / contain; 
     position: absolute;
     left: calc(80vw *(600/780));
-    top: calc(80vw *(260/780));
+    top: calc(50vh); /* height is calculated from center of court based on full screen to accommodate vertical; inexact due to dropdown thing*/
     touch-action: none;
 }

@@ -104,29 +104,30 @@ document.addEventListener('DOMContentLoaded', (event) => {
         points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy});
         drawPolygon(points, 'rgba(0, 0, 0, 0.4)',ctx);
     }
-    
+
     function handlePlayerSelection(event) { 
         const scenario = event.target.value; 
+        const courtHeight = court.clientHeight;
         switch (scenario) { 
             case 'Scenario0': 
-                hitter1.style.left = 'calc(80vw *(100/780))';
-                hitter1.style.top = 'calc(80vw *(165/780))'; 
+                hitter1.style.left = 'calc(80vw *(200/780))'; 
+                hitter1.style.top = '50vh';  
                 returner1.style.left = 'calc(80vw *(600/780))'; 
-                returner1.style.top = 'calc(80vw *(160/780))';
+                returner1.style.top = '50vh'; 
                 toggleSwitch.checked = false;
                 break; 
             case 'Scenario1': 
-                hitter1.style.left = 'calc(80vw *(370/780))'; 
-                hitter1.style.top = 'calc(80vw *(12/780))'; 
-                returner1.style.left = 'calc(80vw *(525/780))'; 
-                returner1.style.top = 'calc(80vw *(100/780))'; 
+                hitter1.style.left = '40vw'; 
+                hitter1.style.top = `calc(50vh - ${courtHeight/1.8}px)`; 
+                returner1.style.left = 'calc(80vw * (525/780))';
+                returner1.style.top = `calc(50vh - ${courtHeight/2.6}px)`;
                 toggleSwitch.checked = true;
                 break; 
             case 'Scenario2': 
                 hitter1.style.left = 'calc(80vw *(60/780))'; 
-                hitter1.style.top = 'calc(80vw *(275/780))'; 
+                hitter1.style.top = `calc(50vh + ${courtHeight/6}px)`; 
                 returner1.style.left = 'calc(80vw *(525/780))'; 
-                returner1.style.top = 'calc(80vw *(250/780))'; 
+                returner1.style.top = `calc(50vh + ${courtHeight/8}px)`;  
                 toggleSwitch.checked = false;
                 break; 
         }
