@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const targetBaselineBottom = { x: courtRect.right + 1, y: courtRect.top + courtRect.height };     
 
         const returnerRect = returner1.getBoundingClientRect();    
-        const returnerCoords = getCoordinates(returner1, courtRect);
+        const returnerCoords = getCenterCoordinates(returner1, courtRect);
 
         const hitterRect = hitter1.getBoundingClientRect();
         const hitterHandedness = toggleSwitch.checked ? 'left' : 'right';
@@ -31,10 +31,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
             hitter1Scale = -1;
             hitter1Deg = 180;
         }
-        const hitterCoords = getCoordinates(tennisBall, courtRect);
+        const tennisBallCenter = getCenterCoordinates(tennisBall, courtRect);
 
         // Calculate the angle between hitter and returner 
-        const facingAngle = getFacingAngle(returnerCoords, hitterCenter); 
+        const facingAngle = getFacingAngle(returnerCoords, tennisBallCenter); 
         // Calculate rotation to the returner 
         const returnerRectRotated = getRotatedBoundingBox(returnerRect.left - courtRect.left, returnerRect.top - courtRect.top, returnerRect.width, returnerRect.height, -1* facingAngle);
         const returnerBlockingCoords = {topx: returnerRectRotated.midTop.x, topy: returnerRectRotated.midTop.y, botx: returnerRectRotated.midBottom.x, boty: returnerRectRotated.midBottom.y};
@@ -43,24 +43,24 @@ document.addEventListener('DOMContentLoaded', (event) => {
         returner1.style.transform = `rotate(${facingAngle}deg)`;
         hitter1.style.transform = `scaleX(${hitter1Scale}) rotate(${hitter1Deg}deg)`;
 
-        const playerDistance = getDistanceBetweenPoints(hitterCoords.x, hitterCoords.y, returnerCoords.x, returnerCoords.y);
+        const playerDistance = getDistanceBetweenPoints(tennisBallCenter.x, tennisBallCenter.y, returnerCoords.x, returnerCoords.y);
 
         points = []
         // Lines from the tennisball to the returner (light gray lines)
         ctx.beginPath();
-        ctx.moveTo(hitterCoords.x, hitterCoords.y);
+        ctx.moveTo(tennisBallCenter.x, tennisBallCenter.y);
         ctx.lineTo(returnerBlockingCoords.topx, returnerBlockingCoords.topy);
         points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy});
-        intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.topx, returnerBlockingCoords.topy, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+        intersectionPoint = getLinesIntersectionPoint(tennisBallCenter.x, tennisBallCenter.y, returnerBlockingCoords.topx, returnerBlockingCoords.topy, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
         points.push({x: intersectionPoint.x, y: intersectionPoint.y});
         ctx.strokeStyle = 'gray';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(hitterCoords.x, hitterCoords.y);
+        ctx.moveTo(tennisBallCenter.x, tennisBallCenter.y);
         ctx.lineTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
-        intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.botx, returnerBlockingCoords.boty, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+        intersectionPoint = getLinesIntersectionPoint(tennisBallCenter.x, tennisBallCenter.y, returnerBlockingCoords.botx, returnerBlockingCoords.boty, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
         points.push({x: intersectionPoint.x, y: intersectionPoint.y});
         points.push({x: returnerBlockingCoords.botx, y: returnerBlockingCoords.boty});
         // complete polygon points
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         strafeCoords = getPointFromAngle(returnerBlockingCoords.topx, returnerBlockingCoords.topy, facingAngle - 85, playerDistance/5);
         ctx.lineTo(strafeCoords.x, strafeCoords.y);
         points.push({x: strafeCoords.x, y: strafeCoords.y});
-        intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+        intersectionPoint = getLinesIntersectionPoint(tennisBallCenter.x, tennisBallCenter.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
         ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
         points.push({x: intersectionPoint.x, y: intersectionPoint.y});
         ctx.strokeStyle = 'gray';
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         ctx.moveTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
         strafeCoords = getPointFromAngle(returnerBlockingCoords.botx, returnerBlockingCoords.boty, facingAngle + 85, playerDistance/5);
         ctx.lineTo(strafeCoords.x, strafeCoords.y);
-        intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+        intersectionPoint = getLinesIntersectionPoint(tennisBallCenter.x, tennisBallCenter.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
         ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
         points.push({x: intersectionPoint.x, y: intersectionPoint.y});
         points.push({x: strafeCoords.x, y: strafeCoords.y});

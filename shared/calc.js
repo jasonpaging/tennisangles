@@ -1,10 +1,19 @@
-function getCoordinates(obj, courtRect) {
+function getCenterCoordinates(obj, courtRect) {
     const rect = obj.getBoundingClientRect();
     return {
         x: (rect.left - courtRect.left + (rect.width /2)),
-        y: (rect.top - courtRect.top + (rect.height /3))
+        y: (rect.top - courtRect.top + (rect.height /2))
     };
 }
+
+function getCoordinates(obj, courtRect) {
+    const rect = obj.getBoundingClientRect();
+    return {
+        x: (rect.left - courtRect.left),
+        y: (rect.top - courtRect.top)
+    };
+}
+
 function getCoordinatesWithHandedness(coords,player="hitter",side="right", hitterHandedAdjustment=0) {
     let playerAdj, sideAdj;
     if (player==="hitter"){
@@ -86,6 +95,6 @@ function getPointFromAngle(x1, y1, angle, length) {
 }
 
 // gets the Angle such that the first object can be rotated to face the second object.  The angle is in degrees.
-function getFacingAngle(returnerCoords, hitterCenter) {
-    return Math.atan2(returnerCoords.y - hitterCenter.y, returnerCoords.x - hitterCenter.x) * 180 / Math.PI;
+function getFacingAngle(objCenter, pointToFace) {
+    return Math.atan2(objCenter.y - pointToFace.y, objCenter.x - pointToFace.x) * 180 / Math.PI;
 }
