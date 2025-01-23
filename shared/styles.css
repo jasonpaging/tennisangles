@@ -138,3 +138,13 @@ canvas {
     top: calc(50vh); /* height is calculated from center of court based on full screen to accommodate vertical; inexact due to dropdown thing*/
     touch-action: none;
 }
+
+#returner2 { 
+    width: calc(80vw *(329/780/4.7)); /* Adjust the size as needed 196x329 */ 
+    height: calc(80vw *(196/780/4.7)); 
+    background: url('returner2.png') no-repeat center center / contain; 
+    position: absolute;
+    left: calc(80vw *(750/780));
+    top: calc(50vh); /* height is calculated from center of court based on full screen to accommodate vertical; inexact due to dropdown thing*/
+    touch-action: none;
+}

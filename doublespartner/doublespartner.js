@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const tennisBall = document.getElementById('tennisball');
     const hitter1 = document.getElementById('hitter1');
     const returner1 = document.getElementById('returner1');
-             
-    function drawLineOfSight() {
+    const returner2 = document.getElementById('returner2');
+    
+    function drawLineOfSight(newCoordinates) {
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
         const courtRect = court.getBoundingClientRect();
         const targetBaselineTop = { x: courtRect.right, y: courtRect.top };
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             hitter1Scale = -1;
             hitter1Deg = 180;
         }
-        const hitterCoords = getCoordinates(tennisBall, courtRect);
+        const tennisBallCenter = getCenterCoordinates(tennisBall, courtRect);
 
         // Calculate the angle between hitter and returner 
         const facingAngle = getFacingAngle(returnerCoords, hitterCenter); 
@@ -43,24 +44,24 @@ document.addEventListener('DOMContentLoaded', (event) => {
         returner1.style.transform = `rotate(${facingAngle}deg)`;
         hitter1.style.transform = `scaleX(${hitter1Scale}) rotate(${hitter1Deg}deg)`;
 
-        const playerDistance = getDistanceBetweenPoints(hitterCoords.x, hitterCoords.y, returnerCoords.x, returnerCoords.y);
+        const playerDistance = getDistanceBetweenPoints(tennisBallCenter.x, tennisBallCenter.y, returnerCoords.x, returnerCoords.y);
 
         points = []
         // Lines from the tennisball to the returner (light gray lines)
         ctx.beginPath();
-        ctx.moveTo(hitterCoords.x, hitterCoords.y);
+        ctx.moveTo(tennisBallCenter.x, tennisBallCenter.y);
         ctx.lineTo(returnerBlockingCoords.topx, returnerBlockingCoords.topy);
         points.push({x: returnerBlockingCoords.topx, y: returnerBlockingCoords.topy});
-        intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.topx, returnerBlockingCoords.topy, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+        intersectionPoint = getLinesIntersectionPoint(tennisBallCenter.x, tennisBallCenter.y, returnerBlockingCoords.topx, returnerBlockingCoords.topy, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
         points.push({x: intersectionPoint.x, y: intersectionPoint.y});
         ctx.strokeStyle = 'gray';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(hitterCoords.x, hitterCoords.y);
+        ctx.moveTo(tennisBallCenter.x, tennisBallCenter.y);
         ctx.lineTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
-        intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, returnerBlockingCoords.botx, returnerBlockingCoords.boty, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+        intersectionPoint = getLinesIntersectionPoint(tennisBallCenter.x, tennisBallCenter.y, returnerBlockingCoords.botx, returnerBlockingCoords.boty, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
         points.push({x: intersectionPoint.x, y: intersectionPoint.y});
         points.push({x: returnerBlockingCoords.botx, y: returnerBlockingCoords.boty});
         // complete polygon points
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         strafeCoords = getPointFromAngle(returnerBlockingCoords.topx, returnerBlockingCoords.topy, facingAngle - 85, playerDistance/5);
         ctx.lineTo(strafeCoords.x, strafeCoords.y);
         points.push({x: strafeCoords.x, y: strafeCoords.y});
-        intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+        intersectionPoint = getLinesIntersectionPoint(tennisBallCenter.x, tennisBallCenter.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
         ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
         points.push({x: intersectionPoint.x, y: intersectionPoint.y});
         ctx.strokeStyle = 'gray';
@@ -92,7 +93,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         ctx.moveTo(returnerBlockingCoords.botx, returnerBlockingCoords.boty);
         strafeCoords = getPointFromAngle(returnerBlockingCoords.botx, returnerBlockingCoords.boty, facingAngle + 85, playerDistance/5);
         ctx.lineTo(strafeCoords.x, strafeCoords.y);
-        intersectionPoint = getLinesIntersectionPoint(hitterCoords.x, hitterCoords.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
+        intersectionPoint = getLinesIntersectionPoint(tennisBallCenter.x, tennisBallCenter.y, strafeCoords.x, strafeCoords.y, targetBaselineTop.x,targetBaselineTop.y,targetBaselineBottom.x,targetBaselineBottom.y);
         ctx.lineTo(intersectionPoint.x, intersectionPoint.y);
         points.push({x: intersectionPoint.x, y: intersectionPoint.y});
         points.push({x: strafeCoords.x, y: strafeCoords.y});
@@ -105,32 +106,59 @@ document.addEventListener('DOMContentLoaded', (event) => {
         drawPolygon(points, 'rgba(0, 0, 0, 0.4)',ctx);
     }
     
+    const startDrag = (e, playerDrag, playerFollow) => {
+        isDragging = true;
+        let offsetX = e.clientX - playerDrag.getBoundingClientRect().left;
+        let offsetY = e.clientY - playerDrag.getBoundingClientRect().top;
+        let offsetFollowX = playerDrag.getBoundingClientRect().left - playerFollow.getBoundingClientRect().left;
+        let offsetFollowY = playerDrag.getBoundingClientRect().top - playerFollow.getBoundingClientRect().top;
+
+        const mouseMoveHandler = (e) => {
+            if (isDragging) {
+                const newX = e.clientX - offsetX;
+                const newY = e.clientY - offsetY;
+                playerDrag.style.left = `${newX}px`;
+                playerDrag.style.top = `${newY}px`;
+                playerFollow.style.left = `${newX - offsetFollowX}px`;
+                playerFollow.style.top = `${newY - offsetFollowY}px`;
+                
+                drawLineOfSight();
+            }
+        };
+
+        const mouseUpHandler = () => {
+            isDragging = false;
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+        };
+
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+    };
+
     function handlePlayerSelection(event) { 
         const scenario = event.target.value; 
+        const courtHeight = court.clientHeight;
         switch (scenario) { 
             case 'Scenario0': 
-                hitter1.style.left = 'calc(80vw *(100/780))';
-                hitter1.style.top = 'calc(80vw *(165/780))'; 
-                returner1.style.left = 'calc(80vw *(600/780))'; 
-                returner1.style.top = 'calc(80vw *(160/780))';
-                toggleSwitch.checked = false;
-                break; 
-            case 'Scenario1': 
-                hitter1.style.left = 'calc(80vw *(370/780))'; 
-                hitter1.style.top = 'calc(80vw *(12/780))'; 
-                returner1.style.left = 'calc(80vw *(525/780))'; 
-                returner1.style.top = 'calc(80vw *(100/780))'; 
-                toggleSwitch.checked = true;
-                break; 
-            case 'Scenario2': 
-                hitter1.style.left = 'calc(80vw *(60/780))'; 
-                hitter1.style.top = 'calc(80vw *(275/780))'; 
-                returner1.style.left = 'calc(80vw *(525/780))'; 
-                returner1.style.top = 'calc(80vw *(250/780))'; 
+                hitter1.style.left = 'calc(80vw *(200/780))'; 
+                hitter1.style.top = '50vh';  
+                returner1.style.left = 'calc(80vw *(600/780))';
+                returner1.style.top = `calc(50vh - ${courtHeight/5}px)`; 
+                returner2.style.left = 'calc(80vw *(600/780))';
+                returner2.style.top = `calc(50vh + ${courtHeight/6}px)`; 
                 toggleSwitch.checked = false;
                 break; 
         }
         drawLineOfSight();
+    }
+
+    function initDoublesPartners(returner1, returner2) {
+        const courtHeight = court.clientHeight;
+        returner1.style.left = 'calc(80vw *(600/780))';
+        returner1.style.top = `calc(50vh - ${courtHeight/5}px)`; 
+        returner2.style.left = 'calc(80vw *(600/780))';
+        returner2.style.top = `calc(50vh + ${courtHeight/6}px)`; 
     }
 
     function resizeCanvas() { 
@@ -139,7 +167,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         drawLineOfSight(); // Redraw on resize 
     }
     
-    [hitter1, returner1].forEach(player => {
+    [hitter1].forEach(player => {
         let offsetX, offsetY;
         // Touch events
         player.addEventListener('touchstart', function(e) {
@@ -158,7 +186,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }, { passive: false });
         player.addEventListener('touchend', function(e) {
             // You can handle touchend event here if needed
-            console.log(`player position: ${player.style.left}, ${player.style.top}`);
         }, { passive: false });
 
         // Mouse events
@@ -184,10 +211,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         
     });
 
+    returner1.addEventListener('mousedown', (e) => startDrag(e, returner1, returner2));
+    returner2.addEventListener('mousedown', (e) => startDrag(e, returner2, returner1));
+
     window.addEventListener('resize', resizeCanvas);
     window.addEventListener('orientationchange', resizeCanvas);                       
     toggleSwitch.addEventListener('change', drawLineOfSight);
     scenarioSelector.addEventListener('change', handlePlayerSelection);
-
+    initDoublesPartners(returner1, returner2);
     resizeCanvas(); // Initial call to set canvas size, draw elements
 });
